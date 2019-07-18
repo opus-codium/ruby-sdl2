@@ -101,7 +101,6 @@ static void quit(VALUE unused)
  * * SDL2::INIT_VIDEO - video subsystem
  * * SDL2::INIT_JOYSTICK - joystick subsystem
  * * SDL2::INIT_HAPTIC - haptic (force feedback) subsystem
- *     (interface is not implemented yet)
  * * SDL2::INIT_GAMECONTROLLER - controller subsystem
  * * SDL2::INIT_EVENTS - events subsystem
  * * SDL2::INIT_EVERYTHING - all of the above flags
@@ -231,6 +230,7 @@ void Init_sdl2_ext(void)
     rubysdl2_init_key();
     rubysdl2_init_mouse();
     rubysdl2_init_joystick();
+    rubysdl2_init_haptic();
     rubysdl2_init_gamecontorller();
     rubysdl2_init_timer();
     rubysdl2_init_image();

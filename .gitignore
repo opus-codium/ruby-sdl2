@@ -9,6 +9,7 @@ gl.c
 ttf.c
 mixer.c
 joystick.c
+haptic.c
 gamecontroller.c
 extconf.h
 pkg/

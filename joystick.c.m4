@@ -337,3 +337,9 @@ void rubysdl2_init_joystick(void)
 
     
 }
+
+SDL_Joystick *rubysdl2_get_joystick(VALUE joystick)
+{
+    Joystick *j = Get_Joystick(joystick);
+    return j->joystick;
+}
