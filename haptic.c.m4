@@ -28,26 +28,7 @@ DEFINE_WRAPPER(SDL_Haptic, Haptic, haptic, cHaptic, "SDL2::Haptic");
 
 static VALUE cHapticEffect;
 
-typedef struct HapticEffect {
-    SDL_HapticEffect *haptic_effect;
-} HapticEffect;
-
-#if 0
-static void HapticEffect_free(HapticEffect *effect)
-{
-    free(effect);
-}
-
-static VALUE HapticEffect_new(SDL_HapticEffect *effect)
-{
-    printf("===> HapticEffect_new\n");
-    HapticEffect *e = ALLOC(HapticEffect);
-    e->haptic_effect = effect;
-    return Data_Wrap_Struct(cHapticEffect, 0, HapticEffect_free, e);
-}
-#endif
-
-DEFINE_WRAPPER(SDL_HapticEffect, HapticEffect, haptic_effect, cHapticEffect, "SDL2::HapticEffect");
+DEFINE_GETTER(static, SDL_HapticEffect, cHapticEffect, "SDL2::HapticEffect");
 
 static VALUE cHapticConstant;
 
@@ -155,35 +136,37 @@ static VALUE Haptic_unpause(VALUE self)
 
 //
 
-static VALUE HapticEffect_new(SDL_HapticEffect *effect)
+static VALUE HapticEffect_s_allocate(VALUE klass)
 {
-    printf("===> HapticEffect_new\n");
-    HapticEffect *e = ALLOC(HapticEffect);
-    e->haptic_effect = ALLOC(SDL_HapticEffect);
-    return Data_Wrap_Struct(cHapticEffect, 0, free, e);
-}
-
-static VALUE HapticEffect_s_new(int argc, VALUE *argv, VALUE self)
-{
-    printf("===> HapticEffect_s_new\n");
     SDL_HapticEffect *effect;
-    return HapticEffect_new(effect);
+    return Data_Make_Struct(klass, SDL_HapticEffect, 0, free, effect);
 }
 
-static VALUE HapticEffect_get_type(VALUE self)
-{
-    printf("===> HapticEffect_get_type\n");
-    int res = Get_SDL_HapticEffect(self)->type;
-    printf("    %d\n", res);
-    return INT2NUM(Get_SDL_HapticEffect(self)->type);
-}
-
-static VALUE HapticEffect_set_type(VALUE self, VALUE type)
+static VALUE HapticEffect_initialize(int argc, VALUE *argv, VALUE self)
 {
     SDL_HapticEffect *effect = Get_SDL_HapticEffect(self);
-    effect->type = NUM2INT(type);
-    return type;
+    return Qnil;
 }
+
+#define FIELD_ACCESSOR(classname, typename, field)              \
+    static VALUE classname##_##field(VALUE self)                \
+    {                                                           \
+        typename* r; Data_Get_Struct(self, typename, r);        \
+        return INT2NUM(r->field);                               \
+    }                                                           \
+    static VALUE classname##_set_##field(VALUE self, VALUE val) \
+    {                                                           \
+        typename* r; Data_Get_Struct(self, typename, r);        \
+        r->field = NUM2INT(val); return val;                    \
+    }
+
+FIELD_ACCESSOR(HapticEffect, SDL_HapticEffect, type);
+
+/*
+define(`DEFINE_C_ACCESSOR',`rb_define_method($2, "$3", $1_$3, 0);
+    rb_define_method($2, "$3=", $1_set_$3, 1)')
+ */
+
 
 void rubysdl2_init_haptic(void)
 {
@@ -208,10 +191,9 @@ void rubysdl2_init_haptic(void)
 
     cHapticEffect = rb_define_class_under(mSDL2, "HapticEffect", rb_cObject);
 
-    rb_undef_alloc_func(cHapticEffect);
-    rb_define_singleton_method(cHapticEffect, "new", HapticEffect_s_new, -1);
-    rb_define_method(cHapticEffect, "type", HapticEffect_get_type, 0);
-    rb_define_method(cHapticEffect, "type=", HapticEffect_set_type, 1);
+    rb_define_alloc_func(cHapticEffect, HapticEffect_s_allocate);
+    rb_define_method(cHapticEffect, "initialize", HapticEffect_initialize, -1);
+    DEFINE_C_ACCESSOR(HapticEffect, cHapticEffect, type);
 
     cHapticConstant = rb_define_class_under(mSDL2, "HapticConstant", rb_cObject);
 }
