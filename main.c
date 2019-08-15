@@ -182,6 +182,14 @@ void Init_sdl2_ext(void)
     DEFINE_SDL_INIT_CONST(EVERYTHING);
     DEFINE_SDL_INIT_CONST(NOPARACHUTE);
 
+#define DEFINE_SDL_HAPTIC_CONST(type)                                     \
+    rb_define_const(mSDL2, "HAPTIC_" #type, UINT2NUM(SDL_HAPTIC_##type))
+
+    DEFINE_SDL_HAPTIC_CONST(SINE);
+    DEFINE_SDL_HAPTIC_CONST(TRIANGLE);
+    DEFINE_SDL_HAPTIC_CONST(SAWTOOTHUP);
+    DEFINE_SDL_HAPTIC_CONST(SAWTOOTHDOWN);
+
     /* SDL's version string  */
     rb_define_const(mSDL2, "LIBSDL_VERSION", libsdl_version());
     /* SDL's version array of numbers  */
