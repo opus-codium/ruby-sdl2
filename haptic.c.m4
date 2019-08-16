@@ -30,6 +30,9 @@ static VALUE cHapticEffect;
 
 DEFINE_GETTER(static, SDL_HapticEffect, cHapticEffect, "SDL2::HapticEffect");
 
+static VALUE cHapticDirection;
+DEFINE_GETTER(static, SDL_HapticDirection, cHapticDirection, "SDL2::HapticDirection");
+
 static VALUE cHapticConstant;
 
 typedef struct HapticConstant {
@@ -162,6 +165,46 @@ static VALUE HapticEffect_initialize(int argc, VALUE *argv, VALUE self)
 
 FIELD_ACCESSOR(HapticEffect, SDL_HapticEffect, type);
 
+static VALUE HapticDirection_s_allocate(VALUE klass)
+{
+    SDL_HapticDirection *direction;
+    return Data_Make_Struct(klass, SDL_HapticDirection, 0, free, direction);
+}
+
+static VALUE HapticDirection_initialize(int argc, VALUE argv, VALUE self)
+{
+    SDL_HapticDirection *direction = Get_SDL_HapticDirection(self);
+    return Qnil;
+}
+
+FIELD_ACCESSOR(HapticDirection, SDL_HapticDirection, type);
+
+VALUE HapticDirection_dir(VALUE self)
+{
+    int *dir = Get_SDL_HapticDirection(self)->dir;
+
+    VALUE result;
+
+    result = rb_ary_new2(3);
+    for (int i = 0; i < 3; i++)
+        rb_ary_push(result, INT2NUM(dir[i]));
+
+    return result;
+}
+
+VALUE HapticDirection_set_dir(VALUE self, VALUE dir)
+{
+    Sint32 *d = Get_SDL_HapticDirection(self)->dir;
+
+    for (int i = 0; i < 3; i++) {
+        VALUE r = rb_ary_entry(dir, i);
+        if (r != Qnil)
+            d[i] = NUM2INT(r);
+    }
+
+    return dir;
+}
+
 /*
 define(`DEFINE_C_ACCESSOR',`rb_define_method($2, "$3", $1_$3, 0);
     rb_define_method($2, "$3=", $1_set_$3, 1)')
@@ -194,6 +237,12 @@ void rubysdl2_init_haptic(void)
     rb_define_alloc_func(cHapticEffect, HapticEffect_s_allocate);
     rb_define_method(cHapticEffect, "initialize", HapticEffect_initialize, -1);
     DEFINE_C_ACCESSOR(HapticEffect, cHapticEffect, type);
+
+    cHapticDirection = rb_define_class_under(mSDL2, "HapticDirection", rb_cObject);
+    rb_define_alloc_func(cHapticDirection, HapticDirection_s_allocate);
+    rb_define_method(cHapticDirection, "initialize", HapticDirection_initialize, -1);
+    DEFINE_C_ACCESSOR(HapticDirection, cHapticDirection, type);
+    DEFINE_C_ACCESSOR(HapticDirection, cHapticDirection, dir);
 
     cHapticConstant = rb_define_class_under(mSDL2, "HapticConstant", rb_cObject);
 }

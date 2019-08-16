@@ -190,6 +190,10 @@ void Init_sdl2_ext(void)
     DEFINE_SDL_HAPTIC_CONST(SAWTOOTHUP);
     DEFINE_SDL_HAPTIC_CONST(SAWTOOTHDOWN);
 
+    DEFINE_SDL_HAPTIC_CONST(CARTESIAN);
+    DEFINE_SDL_HAPTIC_CONST(POLAR);
+    DEFINE_SDL_HAPTIC_CONST(SPHERICAL);
+
     /* SDL's version string  */
     rb_define_const(mSDL2, "LIBSDL_VERSION", libsdl_version());
     /* SDL's version array of numbers  */
